@@ -50,7 +50,7 @@ let loginForm = reactive({
     password: '',
 })
 function login() {
-    app?.appContext.config.globalProperties.$router.push('/demo')
+    app?.appContext.config.globalProperties.$router.push('/layout')
 }
 
 

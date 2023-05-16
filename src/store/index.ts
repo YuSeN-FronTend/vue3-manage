@@ -5,7 +5,8 @@ export const useCar = defineStore('test', {
         return({
             email: '',
             password: '',
-            name: ''
+            name: '',
+            isCollapse: false,
         })
     }
 })
