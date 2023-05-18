@@ -14,15 +14,13 @@
 
 <script setup lang="ts">
 import { useCar } from '../../store/index'
-import { ref } from 'vue'
 let props = defineProps(['navData'])
 
 let store = useCar();
-let treeNode = sessionStorage.getItem('routePath')||'/dashboard'
-const handleSelect = (key: any, keyPath: any) => {
-    console.log(key);
+let treeNode = store.routePath
+const handleSelect = (key: any) => {
     
-    sessionStorage.setItem('routePath', key)
+    store.handleRoutePath(key)
 };
 
 </script>

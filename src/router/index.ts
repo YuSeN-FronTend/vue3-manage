@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router';
-
+import { useCar } from '../store'
 const routes:any = [
     {
         path: '/',
@@ -61,5 +61,39 @@ const router = createRouter({
     history: createWebHistory(),
     routes
 })
+router.beforeEach((to, from, next) => {
+    if(to.name === 'Login') {
+        if(sessionStorage.getItem('routePath')) {
+            sessionStorage.removeItem('routePath')
+        }
+        if (sessionStorage.getItem('tabRoutes')) {
+            sessionStorage.removeItem('tabRoutes')
+        }
+        next()
+    } else if (from.name === 'Login') {
+        if(!sessionStorage.getItem('tabRoutes')){
+            useCar().addTabRoutes({
+                name: to.fullPath,
+                title: to.meta.name,
+                icon: to.meta.icon
+            })
+        }
+        next()
+    } else if (to.name !== 'Login') {
+        let handleRoutes = JSON.parse(String(sessionStorage.getItem('tabRoutes')))
+        let result = handleRoutes.some((item:any) => to.fullPath === item.name);
+        if(!result){
+            useCar().addTabRoutes({
+                name: to.fullPath,
+                title: to.meta.name,
+                icon: to.meta.icon
+            })
+        }
+        next();
+    } else {
+        next()
+    }     
+})
+
 
 export default router;

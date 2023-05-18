@@ -9,6 +9,7 @@
           <Header/>
         </el-header>
         <el-main>
+          <trendsRouterTabs/>
           <router-view v-slot="{ Component }">
             <transition>
               <component :is="Component" />
@@ -23,6 +24,7 @@
 <script setup lang="ts">
 import Aside from '../components/layout/aside.vue';
 import Header from '../components/layout/header.vue';
+import trendsRouterTabs from '../components/layout/trendsRouterTabs/index.vue'
 import { useRouter } from 'vue-router'
 let list = useRouter().getRoutes().filter((item) => item.meta.type === 'first');
 
@@ -46,6 +48,7 @@ let list = useRouter().getRoutes().filter((item) => item.meta.type === 'first');
 
   .el-main {
     background-color: #e1e5ec;
+    padding: 0;
     height: 93vh;
   }
 }
