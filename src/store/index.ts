@@ -19,6 +19,10 @@ export const useCar = defineStore('test', {
         handleRoutePath(routePath: String) {
             this.routePath = routePath;            
             sessionStorage.setItem('routePath', String(this.routePath))
+        },
+        deleteTabRoutes(index: Number) {
+            this.tabRoutes.splice(index,1);
+            sessionStorage.setItem('tabRoutes', JSON.stringify(this.tabRoutes))
         }
     },
     // getters: {

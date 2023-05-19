@@ -14,12 +14,13 @@
 
 <script setup lang="ts">
 import { useCar } from '../../store/index'
+import { storeToRefs } from 'pinia'
 let props = defineProps(['navData'])
 
 let store = useCar();
-let treeNode = store.routePath
+const { routePath } = storeToRefs(store)
+let treeNode = routePath
 const handleSelect = (key: any) => {
-    
     store.handleRoutePath(key)
 };
 
