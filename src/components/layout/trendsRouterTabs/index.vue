@@ -1,5 +1,5 @@
 <template>
-    <el-tabs v-model="editableTabsValue" type="card" :closable="closable" @tab-remove="removeTab" @tab-click="handleTab" @tab-add="addTab">
+    <el-tabs v-model="editableTabsValue" type="card" :closable="closable" @tab-remove="removeTab" @tab-click="handleTab">
         <el-tab-pane v-for="item in editableTabs" :key="item.name" :name="item.name">
             <template #label>
                 <el-icon style="margin-right: 8px">
@@ -12,45 +12,48 @@
 </template>
 
 <script setup lang="ts">
-import { getCurrentInstance, ref, watchEffect } from 'vue';
+import { ref, watchEffect } from 'vue';
+// 设置判断边界
+let closable = ref(false)
 import { useCar } from '../../../store'
 import { storeToRefs } from 'pinia';
 let store = useCar();
+// 将路由设置为响应式
 const { routePath } = storeToRefs(store)
 let editableTabsValue = routePath;
-
 let editableTabs = store.tabRoutes
-let closable = ref(false)
-let app = getCurrentInstance();
+
+// 监听tabs为最后一个时不可关闭
 watchEffect(() => {
-    if(store.tabRoutes.length > 1) {
+    if (store.tabRoutes.length > 1) {
         closable.value = true
     } else {
         closable.value = false
     }
 })
+import { useRouter,useRoute } from 'vue-router'
+let router = useRouter();
+let route = useRoute();
+// 点击tabs时切换路由
 function handleTab(e:any) {
-    if(e.props.name !== sessionStorage.getItem('routePath')) {
-        store.handleRoutePath(e.props.name)
-        app?.appContext.config.globalProperties.$router.push(e.props.name)
+    if(e.props.name !== routePath) {
+        router.push(e.props.name)
     }
 }
-
+// 删除tab键做的一些操作
 function removeTab(targetName: any) {
-    let nowRoute = app?.appContext.config.globalProperties.$route.fullPath
+    let nowRoute = route.fullPath
     if(nowRoute === targetName) {
         store.tabRoutes.forEach((item:any, index:number) => {
             if(item.name === targetName) {
                 if(index === store.tabRoutes.length - 1) {
                     store.deleteTabRoutes(index)
                     let name = store.tabRoutes[store.tabRoutes.length - 1].name
-                    store.handleRoutePath(name)
-                    app?.appContext.config.globalProperties.$router.push(name)
+                    router.push(name)
                 } else {
                     store.deleteTabRoutes(index)
                     let name = store.tabRoutes[index].name
-                    store.handleRoutePath(name)
-                    app?.appContext.config.globalProperties.$router.push(name)
+                    router.push(name)
                 }
             }
         });

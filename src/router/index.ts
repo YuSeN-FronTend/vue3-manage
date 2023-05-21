@@ -3,6 +3,10 @@ import { useCar } from '../store'
 const routes:any = [
     {
         path: '/',
+        redirect: '/login'
+    },
+    {
+        path: '/login',
         name: 'Login',
         component: () => import('../view/login.vue')
     },
@@ -31,16 +35,6 @@ const routes:any = [
                             icon: 'House'
                         }
                     },
-                    {
-                        path: '/personCenter',
-                        name: 'PersonCenter',
-                        component: () => import('../view/group/asidefirst/personCenter.vue'),
-                        meta: {
-                            type: 'second',
-                            name: '个人中心',
-                            icon: 'UserFilled'
-                        }
-                    }
                 ]
             },
             {
@@ -51,6 +45,16 @@ const routes:any = [
                     type: 'first',
                     name: '配置中心',
                     icon: 'Setting'
+                }
+            },
+            {
+                path: '/personCenter',
+                name: 'PersonCenter',
+                component: () => import('../view/group/asidefirst/personCenter.vue'),
+                meta: {
+                    type: 'first',
+                    name: '个人中心',
+                    icon: 'UserFilled'
                 }
             }
         ]
@@ -68,31 +72,32 @@ router.beforeEach((to, from, next) => {
         }
         if (sessionStorage.getItem('tabRoutes')) {
             sessionStorage.removeItem('tabRoutes')
-        }
-        next()
-    } else if (from.name === 'Login') {
-        if(!sessionStorage.getItem('tabRoutes')){
-            useCar().addTabRoutes({
-                name: to.fullPath,
-                title: to.meta.name,
-                icon: to.meta.icon
-            })
-        }
+        }        
+        useCar().$reset()
         next()
     } else if (to.name !== 'Login') {
-        let handleRoutes = JSON.parse(String(sessionStorage.getItem('tabRoutes')))
-        let result = handleRoutes.some((item:any) => to.fullPath === item.name);
-        if(!result){
+        if (!sessionStorage.getItem('tabRoutes')) {
             useCar().addTabRoutes({
                 name: to.fullPath,
                 title: to.meta.name,
                 icon: to.meta.icon
             })
+        }else {
+            let handleRoutes = JSON.parse(String(sessionStorage.getItem('tabRoutes')))
+            let result = handleRoutes.some((item: any) => to.fullPath === item.name);
+            if (!result) {
+                useCar().addTabRoutes({
+                    name: to.fullPath,
+                    title: to.meta.name,
+                    icon: to.meta.icon
+                })
+            }
+        }
+        if(to.name !== useCar().routePath) {
+            useCar().handleRoutePath(to.fullPath)
         }
         next();
-    } else {
-        next()
-    }     
+    }
 })
 
 
