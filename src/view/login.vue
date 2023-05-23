@@ -43,6 +43,7 @@
 
 <script setup lang="ts">
 import { ref, getCurrentInstance, reactive } from 'vue';
+import axios from 'axios'
 let isLogin = ref(false);
 let app = getCurrentInstance();
 let loginForm = reactive({
@@ -50,7 +51,11 @@ let loginForm = reactive({
     password: '',
 })
 function login() {
-    app?.appContext.config.globalProperties.$router.push('/layout')
+    axios.get('/api/getData').then((res: any) => {
+      console.log(res);
+      
+    })
+    // app?.appContext.config.globalProperties.$router.push('/layout')
 }
 
 

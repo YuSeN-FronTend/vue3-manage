@@ -6,10 +6,10 @@
             </el-icon>
         </div>
         <div class="header-box">
-            <el-dropdown>
+            <el-dropdown @visible-change="arrowChange">
                 <div class="header-box-img">
                     <img class="image" src="../../assets/image.jpg"/>
-                    <span>超级管理员</span>
+                    <span>超级管理员<el-icon :class="arrow?'arrowTransform':'arrowTransformReturn'"><Icon icon="ArrowDown"></Icon></el-icon></span>
                 </div>
                 <template #dropdown>
                     <el-dropdown-menu>
@@ -42,6 +42,12 @@ function quit() {
 function personCenter() {
     router.push('/personCenter')
 }
+import { ref } from 'vue'
+
+let arrow = ref(false);
+function arrowChange(value:boolean) {
+    arrow.value = value
+}
 </script>
 
 <style lang="scss" scoped>
@@ -52,7 +58,7 @@ function personCenter() {
     justify-content: space-between;
 
     &-box {
-        width: 130px;
+        width: 170px;
         height: 100%;
         display: flex;
         justify-content: center;
@@ -60,7 +66,7 @@ function personCenter() {
 
         &-img {
             height: 100%;
-            width: 130px;
+            width: 100%;
             display: flex;
             justify-content: center;
             align-items: center;
@@ -76,6 +82,9 @@ function personCenter() {
         &-img:focus{
             outline: none;
         }
+    }
+    &-box:hover {
+        background-color: #e4edfa;
     }
     .toggle {
         height: 100%;
@@ -96,6 +105,7 @@ function personCenter() {
         align-items: center;
         .downText{
             margin-right: 10px;
+            width: 70px;
         }
         .downImage{
             height: 50px;
@@ -103,5 +113,15 @@ function personCenter() {
             border-radius:10%;
             margin: 5px 10px;
         }
+    }
+    .arrowTransform{
+        transition: 0.2s;
+        transform-origin: center;
+        transform: rotateZ(180deg);
+    }
+    .arrowTransformReturn {
+        transition: 0.2s;
+        transform-origin: center;
+        transform: rotate(0deg);
     }
 </style>
