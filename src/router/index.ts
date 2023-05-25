@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory } from 'vue-router';
+import { createRouter, createWebHistory, useRouter } from 'vue-router';
 import { useCar } from '../store'
 const routes:any = [
     {
@@ -65,24 +65,43 @@ const router = createRouter({
     history: createWebHistory(),
     routes
 })
+const route: any = [];
 router.beforeEach((to, from, next) => {
-    if(to.name === 'Login') {
-        if(sessionStorage.getItem('routePath')) {
-            sessionStorage.removeItem('routePath')
+    useRouter().getRoutes().forEach((item: any) => {
+        if (item.children.length === 0 && !item.redirect) {
+            route.push(item.path)
         }
-        if (sessionStorage.getItem('tabRoutes')) {
-            sessionStorage.removeItem('tabRoutes')
-        }        
-        useCar().$reset()
-        next()
-    } else if (to.name !== 'Login') {
-        if (!sessionStorage.getItem('tabRoutes')) {
-            useCar().addTabRoutes({
-                name: to.fullPath,
-                title: to.meta.name,
-                icon: to.meta.icon
-            })
-        }else {
+    })
+    if (!route.some((item: any) => to.fullPath === item)){        
+        next('/login')
+    } else {
+        if (to.name === 'Login') {
+            if (sessionStorage.getItem('routePath')) {
+                sessionStorage.removeItem('routePath')
+            }
+            if (sessionStorage.getItem('tabRoutes')) {
+                sessionStorage.removeItem('tabRoutes')
+            }
+            useCar().$reset()
+            sessionStorage.removeItem('userInfo')
+            next()
+        } else if (from.name === 'Login' || from.path === '/') {
+            if (JSON.parse(String(sessionStorage.getItem('userInfo')))?.token) {
+                if (!sessionStorage.getItem('tabRoutes')) {
+                    useCar().addTabRoutes({
+                        name: to.fullPath,
+                        title: to.meta.name,
+                        icon: to.meta.icon
+                    })
+                }
+                if (to.name !== useCar().routePath) {
+                    useCar().handleRoutePath(to.fullPath)
+                }
+                next()
+            } else {
+                next('/login')
+            }
+        } else {
             let handleRoutes = JSON.parse(String(sessionStorage.getItem('tabRoutes')))
             let result = handleRoutes.some((item: any) => to.fullPath === item.name);
             if (!result) {
@@ -92,11 +111,12 @@ router.beforeEach((to, from, next) => {
                     icon: to.meta.icon
                 })
             }
+            // tabs键高亮不跟随显示问题
+            if (to.name !== useCar().routePath) {
+                useCar().handleRoutePath(to.fullPath)
+            }
+            next();
         }
-        if(to.name !== useCar().routePath) {
-            useCar().handleRoutePath(to.fullPath)
-        }
-        next();
     }
 })
 

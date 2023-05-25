@@ -8,7 +8,7 @@ export const useCar = defineStore('test', {
             name: '',
             isCollapse: false,
             routePath: sessionStorage.getItem('routePath') || '/dashboard' as String,
-            tabRoutes: JSON.parse(String(sessionStorage.getItem('tabRoutes'))) || [] as Array<any>
+            tabRoutes: JSON.parse(String(sessionStorage.getItem('tabRoutes'))) || [] as Array<any>,
         }
     },
     actions: {
@@ -25,12 +25,12 @@ export const useCar = defineStore('test', {
             sessionStorage.setItem('tabRoutes', JSON.stringify(this.tabRoutes))
         }
     },
-    // getters: {
-    //     getTabsRoutes(state){
-    //         return state.tabRoutes
-    //     },
-    //     getRoutePath(state) {
-    //         return state.routePath
-    //     }
-    // }
+    getters: {
+        // getTabsRoutes(state){
+        //     return state.tabRoutes
+        // },
+        // getRoutePath(state) {
+        //     return state.routePath
+        // }
+    }
 })

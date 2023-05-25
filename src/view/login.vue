@@ -42,20 +42,26 @@
 </template>
 
 <script setup lang="ts">
-import { ref, getCurrentInstance, reactive } from 'vue';
-import axios from 'axios'
+import { ref, reactive } from 'vue';
+import { useRouter } from 'vue-router';
+import { loginFun } from '../api/user.ts'
 let isLogin = ref(false);
-let app = getCurrentInstance();
 let loginForm = reactive({
     email: '',
     password: '',
 })
-function login() {
-    axios.get('/api/getData').then((res: any) => {
-      console.log(res);
-      
-    })
-    // app?.appContext.config.globalProperties.$router.push('/layout')
+let router = useRouter();
+async function login() {
+    const params = {
+      username: '123',
+      password: '123'
+    }
+    const { data } = await loginFun(params);
+    
+    if(data.code === 200) {
+      sessionStorage.setItem('userInfo', JSON.stringify({ 'token': data.data.token }))
+      router.push('/layout')
+    }
 }
 
 
