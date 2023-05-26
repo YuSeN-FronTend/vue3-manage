@@ -65,13 +65,22 @@ const router = createRouter({
     history: createWebHistory(),
     routes
 })
-const route: any = [];
-router.beforeEach((to, from, next) => {
-    useRouter().getRoutes().forEach((item: any) => {
-        if (item.children.length === 0 && !item.redirect) {
-            route.push(item.path)
+function getRoute(routes:any) {
+    let route: any = [];
+    routes.forEach((item:any) => {
+        if(item.children) {
+            route.push(...getRoute(item.children))
+        } else {
+            if(!item.redirect) {
+                route.push(item.path)
+            }
         }
     })
+    return route;
+}
+let route: any = getRoute(routes);
+
+router.beforeEach((to, from, next) => {
     if (!route.some((item: any) => to.fullPath === item)){        
         next('/login')
     } else {

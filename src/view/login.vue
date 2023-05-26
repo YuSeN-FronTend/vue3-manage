@@ -6,7 +6,7 @@
                     <h2 class="title">Create Account</h2>
                     <span class="text">or use email for login</span>
                     <input class="form__input" type="text" placeholder="Name" v-model="registerForm.name" />
-                    <input class="form__input" type="text" placeholder="Email" v-model="registerForm.email"/>
+                    <input class="form__input" type="text" placeholder="Email" v-model="registerForm.username"/>
                     <input class="form__input" type="password" placeholder="Password" autocomplete="off" v-model="registerForm.password"/>
                     <div class="primary-btn" @click="register">Register</div>
                 </form>
@@ -15,7 +15,7 @@
                 <form>
                     <h2 class="title">Sign in to Website</h2>
                     <span class="text">or use email for registration</span>
-                    <input class="form__input" type="text" placeholder="Email" v-model="loginForm.email"/>
+                    <input class="form__input" type="text" placeholder="Email" v-model="loginForm.username"/>
                     <input class="form__input" type="password" placeholder="Password" autocomplete="off" v-model="loginForm.password"/>
                     <div class="primary-btn" @click="login">Login</div>
                 </form>
@@ -42,36 +42,67 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive } from 'vue';
+import { ref, reactive, getCurrentInstance } from 'vue';
 import { useRouter } from 'vue-router';
-import { loginFun } from '../api/user.ts'
+import { loginFun, registerFun } from '../api/user.ts'
 let isLogin = ref(false);
 let loginForm = reactive({
-    email: '',
+    username: '',
     password: '',
 })
 let router = useRouter();
+let app = getCurrentInstance()?.appContext.config.globalProperties
 async function login() {
-    const params = {
-      username: '123',
-      password: '123'
-    }
-    const { data } = await loginFun(params);
+    const { data } = await loginFun(loginForm);
+    console.log(data);
     
     if(data.code === 200) {
       sessionStorage.setItem('userInfo', JSON.stringify({ 'token': data.data.token }))
+      app?.$message.success({
+        message: data.msg,
+        type: 'success',
+        showClose: true
+      })
       router.push('/layout')
+    } else if(data.code === 500) {
+    loginForm.username = ''
+    loginForm.password = ''
+      app?.$message.error({
+        message: data.msg,
+        type: 'error',
+        showClose: true
+      })
     }
 }
 
 
 let registerForm = reactive({
     name: '',
-    email: '',
+    username: '',
     password: ''
 })
-function register() { 
-    isLogin.value = true
+async function register() {
+    const {data} = await registerFun(registerForm);
+    if(data.code === 200) {
+      registerForm.name = ''
+      registerForm.username = ''
+      registerForm.password = ''
+      app?.$message.success({
+        message: data.msg,
+        type: 'success',
+        showClose: true
+      })
+      isLogin.value = true
+    } else if(data.code === 500) {
+      registerForm.name = ''
+      registerForm.username = ''
+      registerForm.password = ''
+      app?.$message.error({
+        message: data.msg,
+        type: 'error',
+        showClose: true
+      })
+    }
 }
 </script>
 
