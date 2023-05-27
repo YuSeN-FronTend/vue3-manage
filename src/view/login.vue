@@ -17,7 +17,7 @@
                     <span class="text">or use email for registration</span>
                     <input class="form__input" type="text" placeholder="Email" v-model="loginForm.username"/>
                     <input class="form__input" type="password" placeholder="Password" autocomplete="off" v-model="loginForm.password"/>
-                    <div class="primary-btn" @click="login">Login</div>
+                    <div class="primary-btn" @click="login" >Login</div>
                 </form>
             </div>
             <div :class="['switch', { login: isLogin }]">
@@ -42,7 +42,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, getCurrentInstance } from 'vue';
+import { ref, reactive, getCurrentInstance, onMounted, onUnmounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { loginFun, registerFun } from '../api/user.ts'
 let isLogin = ref(false);
@@ -54,7 +54,6 @@ let router = useRouter();
 let app = getCurrentInstance()?.appContext.config.globalProperties
 async function login() {
     const { data } = await loginFun(loginForm);
-    console.log(data);
     
     if(data.code === 200) {
       sessionStorage.setItem('userInfo', JSON.stringify({ 'token': data.data.token }))
@@ -81,6 +80,7 @@ let registerForm = reactive({
     username: '',
     password: ''
 })
+// 实现注册方法
 async function register() {
     const {data} = await registerFun(registerForm);
     if(data.code === 200) {
@@ -104,6 +104,20 @@ async function register() {
       })
     }
 }
+//实现回车登录
+function onSubmit(e:any) {
+  if(e.keyCode === 13 && isLogin.value === true) {
+    login()
+  }
+}
+// 监听触发函数
+onMounted(() => {
+  window.addEventListener('keyup', onSubmit, false);
+})
+// 离开页面时销毁此操作
+onUnmounted(() => {
+  window.removeEventListener('keyup', onSubmit, false)
+})
 </script>
 
 <style lang="scss" scoped>

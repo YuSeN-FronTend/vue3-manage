@@ -14,3 +14,11 @@ export function registerFun(data: any) {
         data: data
     })
 }
+
+export function getDataFun(data: any) {
+    return request({
+        url: '/getData',
+        method: 'post',
+        data: data
+    })
+}
