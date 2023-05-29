@@ -22,7 +22,6 @@
 
 <script setup lang="ts">
 let props = defineProps(['navData']);
-
 </script>
 
 <style scoped>

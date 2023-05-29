@@ -7,7 +7,7 @@ request.interceptors.request.use(
     (config) => {
         let token = JSON.parse(String(sessionStorage.getItem('userInfo')))?.token;
         if(token) {
-            config.headers['authorization'] = `Bearer ${token}`
+            config.headers['authorization'] = token
         }
         return config
     },

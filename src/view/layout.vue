@@ -28,7 +28,6 @@ import trendsRouterTabs from '../components/layout/trendsRouterTabs/index.vue'
 import { useRouter } from 'vue-router'
 let list = useRouter().getRoutes().filter((item) => item.meta.type === 'first');
 
-
 </script>
 
 <style scoped lang="scss">
