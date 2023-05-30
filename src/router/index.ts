@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory, useRouter } from 'vue-router';
+import { createRouter, createWebHistory } from 'vue-router';
 import { useCar } from '../store'
 const routes:any = [
     {
