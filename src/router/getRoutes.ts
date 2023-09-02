@@ -5,6 +5,7 @@ export function generateRoutesFromMenu(menu:any) {
     let newRouters;
     newRouters = menu.map((item:any) => {
         let paths = loadComponent(item?.component);
+        
         let rts = {
             name: item.name,
             path: item.path,
@@ -22,6 +23,7 @@ export function generateRoutesFromMenu(menu:any) {
 }
 function loadComponent(url: string) {
     let Module = import.meta.glob("../view/**/*.vue")
+    
     let path = Module[`../view/${url}.vue`];
     return path;
 }

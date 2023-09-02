@@ -19,7 +19,17 @@
           <input class="form__input" type="text" placeholder="Email" v-model="loginForm.username" />
           <input class="form__input" type="password" placeholder="Password" autocomplete="off"
             v-model="loginForm.password" />
-          <div class="primary-btn" @click="login">Login</div>
+          <div class="check" :class="!dialogTableVisible && checkEmitBol ? 'disabledCheck': ''" @click="checkFun">
+            <div class="round">
+              <div class="white"></div>
+            </div>
+            <div class="text-box">
+              <span class="check-text" v-if="!dialogTableVisible && !checkEmitBol">立即点击验证</span>
+              <span v-else-if="dialogTableVisible" class="check-text">智能检测中...</span>
+              <span v-else-if="!dialogTableVisible && checkEmitBol" class="check-text">验证成功</span>
+            </div>
+          </div>
+          <div class="primary-btn" :class="loginForm.username && loginForm.password && checkEmitBol ? '' : 'disabledLogin'" @click="login">Login</div>
         </form>
       </div>
       <div :class="['switch', { login: isLogin }]">
@@ -40,6 +50,9 @@
         </div>
       </div>
     </div>
+     <el-dialog v-model="dialogTableVisible" width="450px">
+      <loginCheck @checkBol="checkBol" v-if="dialogTableVisible"></loginCheck>
+    </el-dialog>
   </div>
 </template>
 
@@ -48,6 +61,20 @@ import { ref, reactive, getCurrentInstance, onMounted, onUnmounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { loginFun, registerFun } from '../api/user.ts'
 import { generateRoutesFromMenu } from '../router/getRoutes'
+import loginCheck from '../view/loginCheck/index.vue'
+// 消息验证 
+let dialogTableVisible = ref(false);
+let checkEmitBol = ref(false)
+function checkFun() {
+  dialogTableVisible.value = true
+}
+// 验证成功后接收子组件传过来的值
+function checkBol(value: any) {
+  if (value) {
+    dialogTableVisible.value = false;
+    checkEmitBol.value = value;
+  }
+}
 let isLogin = ref(false);
 let loginForm = reactive({
   username: '',
@@ -73,6 +100,7 @@ async function login() {
   } else if (data.code === 500) {
     loginForm.username = ''
     loginForm.password = ''
+    checkEmitBol.value = false
     app?.$message.error({
       message: data.msg,
       type: 'error',
@@ -80,8 +108,6 @@ async function login() {
     })
   }
 }
-
-
 let registerForm = reactive({
   name: '',
   username: '',
@@ -128,6 +154,7 @@ onUnmounted(() => {
 </script>
 
 <style lang="scss" scoped>
+
 .main-box {
   height: 100%;
   width: 100%;
@@ -200,120 +227,209 @@ onUnmounted(() => {
           color: #a0a5a8;
         }
       }
+
+      .check {
+        width: 350px;
+        height: 40px;
+        margin: 4px 0;
+        padding-left: 25px;
+        border: 1px solid #4b70e2;
+        // font-family: 'Montserrat', sans-serif;
+        background-color: #4b71e22c;
+        border-radius: 8px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+
+        .text-box {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+
+          .check-text {
+            font-size: 14px;
+            color: #4b70e2;
+          }
+        }
+
+        .round {
+          width: 15px;
+          height: 15px;
+          background-color: #4b70e2;
+          border-radius: 50%;
+          position: relative;
+          margin-right: 10px;
+
+          .white {
+            width: 5px;
+            height: 5px;
+            background-color: #fff;
+            border-radius: 50%;
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1;
+          }
+        }
+
+        .round::after {
+          content: "";
+          width: 20px;
+          height: 20px;
+          background-color: #4b70e2;
+          border-radius: 50%;
+          position: absolute;
+          top: -2.5px;
+          left: -2.5px;
+          animation: wave 2s ease-out infinite;
+        }
+
+        /* 定义一个波纹效果 */
+        @keyframes wave {
+          0% {
+            opacity: 1;
+            transform: scale(0);
+          }
+
+          100% {
+            opacity: 0;
+            transform: scale(1.5);
+          }
+        }
+      }
     }
-  }
+    }
 
-  .container-register {
-    z-index: 100;
-    left: calc(100% - 600px);
-  }
+    .container-register {
+      z-index: 100;
+      left: calc(100% - 600px);
+    }
 
-  .container-login {
-    left: calc(100% - 600px);
-    z-index: 0;
-  }
+    .container-login {
+      left: calc(100% - 600px);
+      z-index: 0;
+    }
 
-  .is-txl {
-    left: 0;
-    transition: 1.25s;
-    transform-origin: right;
-  }
+    .is-txl {
+      left: 0;
+      transition: 1.25s;
+      transform-origin: right;
+    }
 
-  .is-z200 {
-    z-index: 200;
-    transition: 1.25s;
-  }
-
-  .switch {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    position: absolute;
-    top: 0;
-    left: 0;
-    height: 100%;
-    width: 400px;
-    padding: 50px;
-    box-sizing: border-box;
-    z-index: 200;
-    transition: 1.25s;
-    background-color: #ecf0f3;
-    overflow: hidden;
-    box-shadow: 4px 4px 10px #d1d9e6, -4px -4px 10px #f9f9f9;
-    color: #a0a5a8;
-
-    .switch__circle {
-      position: absolute;
-      width: 500px;
-      height: 500px;
-      border-radius: 50%;
-      background-color: #ecf0f3;
-      box-shadow: inset 8px 8px 12px #d1d9e6, inset -8px -8px 12px #f9f9f9;
-      bottom: -60%;
-      left: -60%;
+    .is-z200 {
+      z-index: 200;
       transition: 1.25s;
     }
 
-    .switch__circle_top {
-      top: -30%;
-      left: 60%;
-      width: 300px;
-      height: 300px;
-    }
-
-    .switch__container {
+    .switch {
       display: flex;
       justify-content: center;
       align-items: center;
-      flex-direction: column;
       position: absolute;
-      width: 400px;
-      padding: 50px 55px;
-      transition: 1.25s;
-
-      h2 {
-        font-size: 34px;
-        font-weight: 700;
-        line-height: 3;
-        color: #181818;
-      }
-
-      p {
-        font-size: 14px;
-        letter-spacing: 0.25px;
-        text-align: center;
-        line-height: 1.6;
-      }
-    }
-  }
-
-  .login {
-    left: calc(100% - 400px);
-
-    .switch__circle {
+      top: 0;
       left: 0;
-    }
-  }
+      height: 100%;
+      width: 400px;
+      padding: 50px;
+      box-sizing: border-box;
+      z-index: 200;
+      transition: 1.25s;
+      background-color: #ecf0f3;
+      overflow: hidden;
+      box-shadow: 4px 4px 10px #d1d9e6, -4px -4px 10px #f9f9f9;
+      color: #a0a5a8;
 
-  .primary-btn {
-    width: 180px;
-    height: 50px;
-    border-radius: 25px;
-    margin-top: 50px;
-    text-align: center;
-    line-height: 50px;
-    font-size: 14px;
-    letter-spacing: 2px;
-    background-color: #4b70e2;
-    color: #f9f9f9;
-    cursor: pointer;
-    box-shadow: 8px 8px 16px #d1d9e6, -8px -8px 16px #f9f9f9;
+      .switch__circle {
+        position: absolute;
+        width: 500px;
+        height: 500px;
+        border-radius: 50%;
+        background-color: #ecf0f3;
+        box-shadow: inset 8px 8px 12px #d1d9e6, inset -8px -8px 12px #f9f9f9;
+        bottom: -60%;
+        left: -60%;
+        transition: 1.25s;
+      }
 
-    &:hover {
-      box-shadow: 4px 4px 6px 0 rgb(255 255 255 / 50%),
-        -4px -4px 6px 0 rgb(116 125 136 / 50%),
-        inset -4px -4px 6px 0 rgb(255 255 255 / 20%),
-        inset 4px 4px 6px 0 rgb(0 0 0 / 40%);
+      .switch__circle_top {
+        top: -30%;
+        left: 60%;
+        width: 300px;
+        height: 300px;
+      }
+
+      .switch__container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        position: absolute;
+        width: 400px;
+        padding: 50px 55px;
+        transition: 1.25s;
+
+        h2 {
+          font-size: 34px;
+          font-weight: 700;
+          line-height: 3;
+          color: #181818;
+        }
+
+        p {
+          font-size: 14px;
+          letter-spacing: 0.25px;
+          text-align: center;
+          line-height: 1.6;
+        }
+      }
     }
+
+    .login {
+      left: calc(100% - 400px);
+
+      .switch__circle {
+        left: 0;
+      }
+    }
+
+    .primary-btn {
+      width: 180px;
+      height: 50px;
+      border-radius: 25px;
+      margin-top: 50px;
+      text-align: center;
+      line-height: 50px;
+      font-size: 14px;
+      letter-spacing: 2px;
+      background-color: #4b70e2;
+      color: #f9f9f9;
+      cursor: pointer;
+      box-shadow: 8px 8px 16px #d1d9e6, -8px -8px 16px #f9f9f9;
+
+      &:hover {
+        box-shadow: 4px 4px 6px 0 rgb(255 255 255 / 50%),
+          -4px -4px 6px 0 rgb(116 125 136 / 50%),
+          inset -4px -4px 6px 0 rgb(255 255 255 / 20%),
+          inset 4px 4px 6px 0 rgb(0 0 0 / 40%);
+      }
+    }
+}
+.disabledCheck {
+  pointer-events: none;   //阻止鼠标事件
+  cursor: not-allowed; //禁用鼠标样式
+}
+.disabledLogin{
+  pointer-events: none;   //阻止鼠标事件
+  cursor: not-allowed; //禁用鼠标样式
+  background-color: #34495e !important;
+}
+</style>
+<style>
+  .el-dialog__body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
-}</style>
+</style>
